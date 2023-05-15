@@ -1,0 +1,21 @@
+form {
+  margin-top: 3rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  text-align: center;
+}
+.results {
+  width: 100%;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  text-align: center;
+  margin-top: 2rem;
+  list-style: none;
+}
+.poster {
+  width: 100%;
+}
