@@ -1,31 +1,26 @@
-import { useState } from 'react'
-import response from '../mocks/response.json'
-import woResponse from '../mocks/woResponse.json'
+import { useState, useRef, useCallback } from 'react'
+import { searchMovies } from '../services/movies'
 
 export function useMovies({ search }) {
-  const [responseMovies, setResponseMovies] = useState([])
+  const [movies, setMovies] = useState([])
+  const [loading, setLoading] = useState(false)
+  const previousSearch = useRef(search)
 
-  const movies = responseMovies.Search
+  const getMovies = useCallback(
+    async ({ search }) => {
+    if (search == previousSearch.current) return
 
-  const mapMovies = movies?.map(movie => ({
-    id: movie.imdbID,
-    title: movie.Title,
-    poster: movie.Poster,
-    year: movie.Year
-  }))
-
-  const getMovies = () => {
-    if (search) {
-      // setResponseMovies(response)
-      fetch(`http://www.omdbapi.com/?apikey=f150e391&s=${search}`)
-        .then(res => res.json())
-        .then(json => {
-          setResponseMovies(json)
-        })
-    } else {
-      setResponseMovies(woResponse)
+    try {
+      setLoading(true)
+      previousSearch.current = search
+      const newMovies = await searchMovies({ search })
+      setMovies(newMovies)
+    } catch(e) {
+      console.error('Error en la aplicacion');
+    } finally {
+      setLoading(false)
     }
-  }
+  }, [] )
 
-  return { movies: mapMovies, getMovies }
+  return { movies, getMovies, loading }
 }

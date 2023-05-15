@@ -1,27 +1,32 @@
+import { useMemo } from 'react'
 import './App.css'
 import { Movies } from './components/Movies'
 import { useMovies } from './hooks/useMovies'
 import { useSearch } from './hooks/useSearch'
+import debounce from 'just-debounce-it'
 
 function App() {
- /*  const API_KEY = 'f150e391'
-  const API = `http://www.omdbapi.com/?apikey=${API_KEY}&s=${search}` */
-
   const { search, updateSearch, error } = useSearch()
-  const { movies, getMovies } = useMovies({ search })
+  const { movies, loading, getMovies } = useMovies({ search })
+
+  const debouncedGetMovies = useMemo(() => {
+    return debounce(search => {
+    console.log('search', search);
+    getMovies({ search })
+  }, 500)}
+  ,[getMovies])
 
   const handleChange = (e) => {
     const newSearch = e.target.value
     if (newSearch.startsWith(' ')) return
     updateSearch(newSearch)
+    debouncedGetMovies(newSearch)
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    getMovies()
+    getMovies({ search })
   }
-
-  
 
   return (
     <>
@@ -45,7 +50,9 @@ function App() {
 
       <main>
         <section>
-          <Movies movies={movies} />
+          {
+            loading ? <p style={{textAlign: 'center'}}>Cargando...</p> : <Movies movies={movies} />
+          }
         </section>
       </main>
     </>
